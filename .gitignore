@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+build/
+dist/
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Environment & secrets (jangan pernah di-commit)
+.env
+.env.*
+!.env.example
+
+# Test, coverage, cache
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.ruff_cache/
+.mypy_cache/
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Docker volume lokal / dump database
+mysql_data/
+*.sql
+*.sqlite3
+
+# Upload lokal (kalau ada)
+uploads/
