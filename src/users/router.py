@@ -7,7 +7,7 @@ from src.schemas import DataResponse, ErrorResponse
 from src.users import service
 from src.users.dependencies import get_current_user
 from src.users.models import User
-from src.users.schemas import UserLogin, UserRead
+from src.users.schemas import UserLogin, UserRead, UserUpdate
 
 router = APIRouter()
 
@@ -55,3 +55,22 @@ async def logout(
 )
 async def me(user: User = Depends(get_current_user)):
     return {"data": user}
+
+
+@router.patch(
+    "/me",
+    response_model=DataResponse[UserRead],
+    responses={
+        400: {"model": ErrorResponse},
+        401: {"model": ErrorResponse},
+        403: {"model": ErrorResponse},
+        409: {"model": ErrorResponse},
+    },
+)
+async def update_me(
+    data: UserUpdate,
+    user: User = Depends(get_current_user),
+    session_token: str | None = Cookie(default=None, alias=settings.COOKIE_NAME),
+    db: AsyncSession = Depends(get_db),
+):
+    return {"data": await service.update_profile(db, user, data, session_token)}
