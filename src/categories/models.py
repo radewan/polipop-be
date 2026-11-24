@@ -1,11 +1,16 @@
 import uuid
 from datetime import datetime
 
+from alembic.environment import TYPE_CHECKING
 from sqlalchemy import DateTime, ForeignKey, String, Uuid
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.utils import utcnow
 from src.database import Base
+
+
+if TYPE_CHECKING:
+    from src.products.models import Product
 
 
 class Category(Base):
@@ -25,3 +30,5 @@ class Category(Base):
     deleted_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), default=None
     )
+
+    products: Mapped[list["Product"]] = relationship(back_populates="category", lazy="raise")

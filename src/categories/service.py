@@ -4,8 +4,9 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.categories.models import Category
-from src.categories.schemas import CategoryCreate, CategoryUpdate
+from src.categories.schemas import CategoryCreate, CategoryRead, CategoryUpdate
 from src.exceptions import Conflict, NotFound
+from src.products.models import Product
 from src.users.models import User, utcnow
 
 
@@ -25,20 +26,33 @@ async def _ensure_unique_name(
 
 async def list_categories(
     db: AsyncSession, user: User, page: int, per_page: int, search: str | None
-) -> tuple[list[Category], int]:
+) -> tuple[list[CategoryRead], int]:
     filters = [Category.user_id == user.id, Category.deleted_at.is_(None)]
     if search:
         filters.append(Category.name.icontains(search.strip(), autoescape=True))
 
     total = await db.scalar(select(func.count()).select_from(Category).where(*filters))
-    rows = await db.scalars(
-        select(Category)
+
+    product_count = (
+        select(func.count(Product.id))
+        .where(Product.category_id == Category.id, Product.deleted_at.is_(None))
+        .correlate(Category)
+        .scalar_subquery()
+    )
+    rows = await db.execute(
+        select(Category, product_count)
         .where(*filters)
         .order_by(Category.created_at.desc(), Category.id)
         .limit(per_page)
         .offset((page - 1) * per_page)
     )
-    return list(rows), total or 0
+    items = [
+        CategoryRead.model_validate(category).model_copy(
+            update={"total_product": count}
+        )
+        for category, count in rows
+    ]
+    return items, total or 0
 
 
 async def get_category(
@@ -80,5 +94,14 @@ async def update_category(
 
 async def delete_category(db: AsyncSession, user: User, category_id: uuid.UUID) -> None:
     category = await get_category(db, user, category_id)
+
+    has_products = await db.scalar(
+        select(Product.id)
+        .where(Product.category_id == category.id, Product.deleted_at.is_(None))
+        .limit(1)
+    )
+    if has_products:
+        raise Conflict("Category still has products")
+
     category.deleted_at = utcnow()
     await db.commit()

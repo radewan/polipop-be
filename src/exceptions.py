@@ -20,3 +20,11 @@ class Unauthorized(AppException):
 
 class Forbidden(AppException):
     status_code = 403
+
+
+class PayloadTooLarge(AppException):
+    status_code = 413
+
+
+class UnsupportedMediaType(AppException):
+    status_code = 415
