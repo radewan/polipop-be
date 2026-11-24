@@ -23,6 +23,7 @@ if config.config_file_name is not None:
 from src.config import settings
 from src.database import Base
 from src.users import models as users_models
+from src.categories import models as categories_models
 
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
 target_metadata = Base.metadata

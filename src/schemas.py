@@ -12,3 +12,14 @@ class ErrorItem(BaseModel):
 
 class ErrorResponse(BaseModel):
     errors: list[ErrorItem] | None = None
+
+class PageMeta(BaseModel):
+    page: int
+    per_page: int
+    total: int
+    total_pages: int
+
+
+class PaginatedResponse(BaseModel, Generic[T]):
+    data: list[T]
+    meta: PageMeta

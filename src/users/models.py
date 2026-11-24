@@ -1,14 +1,12 @@
 import uuid
-from datetime import UTC, datetime
+from datetime import datetime
 
 from sqlalchemy import DateTime, ForeignKey, String, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from src.utils import utcnow
+
 from src.database import Base
-
-
-def utcnow() -> datetime:
-    return datetime.now(UTC)
 
 
 class User(Base):
