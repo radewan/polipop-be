@@ -6,6 +6,7 @@ from src.error_handlers import register_error_handlers
 from src.users.router import router as users_router
 from src.categories.router import router as categories_router
 from src.products.router import router as products_router
+from src.product_mutations.router import router as mutations_router
 from src.config import settings
 
 app = FastAPI(title="Polipop API")
@@ -25,6 +26,7 @@ app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads"
 app.include_router(users_router, prefix="/users", tags=["users"])
 app.include_router(categories_router, prefix="/categories", tags=["categories"])
 app.include_router(products_router, prefix="/products", tags=["products"])
+app.include_router(mutations_router, prefix="/mutations", tags=["mutations"])
 
 
 @app.get("/health")

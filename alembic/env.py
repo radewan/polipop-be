@@ -25,6 +25,7 @@ from src.database import Base
 from src.users import models
 from src.categories import models
 from src.products import models
+from src.product_mutations import models
 
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
 target_metadata = Base.metadata

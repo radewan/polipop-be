@@ -1,3 +1,4 @@
+from decimal import Decimal
 import uuid
 
 from fastapi import UploadFile
@@ -11,6 +12,8 @@ from src.exceptions import AppException, Conflict, NotFound
 from src.products.models import Product
 from src.products.schemas import ProductCreate, ProductUpdate
 from src.users.models import User
+from src.product_mutations.constants import INITIAL_TYPE
+from src.product_mutations.models import ProductMutation
 from src.utils import utcnow
 
 SORT_COLUMNS = {
@@ -116,6 +119,19 @@ async def create_product(db: AsyncSession, user: User, data: ProductCreate) -> P
 
     product = Product(**data.model_dump())
     db.add(product)
+    await db.flush()  # supaya product.id terisi
+
+    if product.stock > 0:
+        db.add(
+            ProductMutation(
+                product_id=product.id,
+                mutation_type=INITIAL_TYPE,
+                quantity=product.stock,
+                stock_before=Decimal("0"),
+                stock_after=product.stock,
+                notes="Initial stock",
+            )
+        )
     await db.commit()
     return await get_product(db, user, product.id)
 

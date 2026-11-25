@@ -1,9 +1,14 @@
 from decimal import Decimal
+from itertools import product
+from itertools import product
+import uuid
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.categories.models import Category
+from src.product_mutations.constants import INITIAL_TYPE
+from src.product_mutations.models import ProductMutation
 from src.products.models import Product
 from src.users.models import User
 
@@ -231,16 +236,29 @@ async def seed_products(db: AsyncSession) -> int:
                 if key in names or (barcode and barcode in barcodes):
                     continue
 
-                db.add(
-                    Product(
-                        category_id=category.id,
-                        name=item["name"],
-                        barcode=barcode,
-                        price=Decimal(item["price"]),
-                        stock=Decimal(item["stock"]),
-                        unit=item["unit"],
-                    )
+                product = Product(
+                    id=uuid.uuid4(),
+                    category_id=category.id,
+                    name=item["name"],
+                    barcode=barcode,
+                    price=Decimal(item["price"]),
+                    stock=Decimal(item["stock"]),
+                    unit=item["unit"],
                 )
+                db.add(product)
+
+                if product.stock > 0:
+                    db.add(
+                        ProductMutation(
+                            product_id=product.id,
+                            mutation_type=INITIAL_TYPE,
+                            quantity=product.stock,
+                            stock_before=Decimal("0"),
+                            stock_after=product.stock,
+                            notes="Initial stock",
+                        )
+                    )
+
                 names.add(key)
                 if barcode:
                     barcodes.add(barcode)

@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     PUBLIC_BASE_URL: str = "http://localhost:8000"  # dipakai membentuk URL gambar
     MAX_IMAGE_BYTES: int = 2 * 1024 * 1024  # 2 MB
     IMAGE_MAX_DIMENSION: int = 1024  # sisi terpanjang, dalam px
+    APP_TIMEZONE: str = "Asia/Jakarta"  # dipakai untuk filter tanggal
     model_config = SettingsConfigDict(env_file=".env")
 
 

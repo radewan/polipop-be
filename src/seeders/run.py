@@ -3,6 +3,7 @@ import asyncio
 from src.config import settings
 from src.database import SessionLocal, engine
 from src.seeders.categories import seed_categories
+from src.seeders.product_mutations import seed_product_mutations
 from src.seeders.products import seed_products
 from src.seeders.users import seed_users
 
@@ -21,6 +22,9 @@ async def main() -> None:
 
             created = await seed_products(db)
             print(f"products: {created} dibuat")
+
+            created = await seed_product_mutations(db)
+            print(f"product_mutations: {created} dibuat")
     finally:
         await engine.dispose()
 
