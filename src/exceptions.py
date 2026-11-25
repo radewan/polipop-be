@@ -28,3 +28,7 @@ class PayloadTooLarge(AppException):
 
 class UnsupportedMediaType(AppException):
     status_code = 415
+
+
+class Unprocessable(AppException):
+    status_code = 422

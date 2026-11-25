@@ -3,10 +3,12 @@ from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, ForeignKey, Numeric, String, Uuid
+from sqlalchemy import ForeignKey, Numeric, String, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.database import Base
+from src.types import UTCDateTime
+from src.types import UTCDateTime
 from src.utils import utcnow
 
 if TYPE_CHECKING:
@@ -27,13 +29,13 @@ class Product(Base):
     stock: Mapped[Decimal] = mapped_column(Numeric(15, 2), default=Decimal("0"))
     unit: Mapped[str] = mapped_column(String(30))
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=utcnow
+        UTCDateTime(), default=utcnow
     )
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=utcnow, onupdate=utcnow
+        UTCDateTime(), default=utcnow, onupdate=utcnow
     )
     deleted_at: Mapped[datetime | None] = mapped_column(
-        DateTime(timezone=True), default=None
+        UTCDateTime(), default=None
     )
 
     category: Mapped["Category"] = relationship(back_populates="products", lazy="raise")

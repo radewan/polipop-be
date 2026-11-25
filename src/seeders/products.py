@@ -1,6 +1,4 @@
 from decimal import Decimal
-from itertools import product
-from itertools import product
 import uuid
 
 from sqlalchemy import select

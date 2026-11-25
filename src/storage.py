@@ -1,7 +1,6 @@
 import asyncio
 import io
 import uuid
-from pathlib import Path
 
 from fastapi import UploadFile
 from PIL import Image, ImageOps

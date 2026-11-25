@@ -2,12 +2,13 @@ from decimal import Decimal
 import uuid
 
 from fastapi import UploadFile
-from sqlalchemy import func, or_, select
+from sqlalchemy import func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import contains_eager
 
 from src import storage
 from src.categories.models import Category
+from src.discounts.models import Discount
 from src.exceptions import AppException, Conflict, NotFound
 from src.products.models import Product
 from src.products.schemas import ProductCreate, ProductUpdate
@@ -160,7 +161,13 @@ async def update_product(
 
 async def delete_product(db: AsyncSession, user: User, product_id: uuid.UUID) -> None:
     product = await get_product(db, user, product_id)
-    product.deleted_at = utcnow()
+    now = utcnow()
+    product.deleted_at = now
+    await db.execute(
+        update(Discount)
+        .where(Discount.product_id == product.id, Discount.deleted_at.is_(None))
+        .values(deleted_at=now)
+    )
     await db.commit()
 
 
